@@ -1,3 +1,15 @@
+<?php
+
+use Illuminate\Support\Facades\Session;
+use App\Models\Mahasiswa;
+
+$npm = Session::get('npm');
+// Retrieve whether this NPM already voted (0 or 1)
+$sudah_vote = Mahasiswa::where('npm', $npm)->value('sudah_vote') ?? 0;
+$role = Mahasiswa::where('npm', $npm)->value('role');
+$nama = Mahasiswa::where('npm', $npm)->value('nama');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +23,8 @@
 
     <!-- Assuming you are using Vite, but the script still relies on inline styles -->
     @vite('resources/css/app.css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
 </head>
 <body class="maroon-bg">
@@ -24,11 +38,19 @@
                         <span class="text-sm text-red-200">Pemilu Raya Hima Humas</span>
                     </div>
             <div class="p-4 text-center">
-                <a href="#" class="block rounded-lg bg-red-800 py-3 px-5 font-medium text-white transition-colors hover:bg-red-700">
+                <a href="/vote" class="block rounded-lg bg-red-800 py-3 px-5 font-medium text-white transition-colors hover:bg-red-700">
                     <i class="fas fa-hand-point-up text-xl"></i>
                     <span class="text-xs block">Vote</span>
                 </a>
             </div>
+            @if($role === 'admin')
+            <div class="p-4 text-center">
+                <a href="/admin" class="block rounded-lg bg-red-800 py-3 px-5 font-medium text-white transition-colors hover:bg-red-700">
+                    <i class="fas fa-user-cog text-xl"></i>
+                    <span class="text-xs block">Admin</span>
+                </a>
+            </div>
+            @endif
         </aside>
 
 
@@ -45,13 +67,13 @@
                 <!-- User Dropdown (Logout) -->
                 <div class="relative">
                     <div id="user-menu-button" class="flex cursor-pointer items-center space-x-2 rounded-full p-1 pr-2 hover:bg-gray-100" onclick="toggleUserMenu()">
-                        <span class=" font-medium text-gray-700 ">User</span>
+                        <span class=" font-medium text-gray-700 ">{{ $nama }}</span>
                         <i class="fas fa-chevron-down hidden text-xs text-gray-500 md:block"></i>
                     </div>
                     <!-- Dropdown Menu -->
                     <div id="user-menu-dropdown" class="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 hidden">
                         <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
-                            <a href="#" class="block px-4 py-2 text-sm font-medium text-red-700 hover:bg-gray-100" role="menuitem">Logout</a>
+                            <a href="/logout" class="block px-4 py-2 text-sm font-medium text-red-700 hover:bg-gray-100" role="menuitem">Logout</a>
                         </div>
                     </div>
                 </div>
@@ -195,6 +217,10 @@
         const visiMisiVideo = document.getElementById('visi-misi-video');
 
         let selectedCandidateId = null;
+
+    // Server-provided values
+    const npm = String(@json($npm ?? ''));
+    let sudahVote = Boolean(@json($sudah_vote ?? 0));
 
         // --- Dummy Candidate Data for Modals ---
         const candidates = {
@@ -346,12 +372,39 @@
                 return;
             }
 
+            // Block if already voted
+            if (sudahVote) {
+                selectionError.classList.remove('hidden');
+                selectionError.innerText = 'Anda sudah melakukan vote. Tidak dapat memilih lagi.';
+                return;
+            }
+
             // Simulate voting process
             finalVoteBtn.disabled = true;
             finalVoteBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...`;
-
             // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            try{
+                const response = await fetch('/submit-vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        npm: npm,
+                        candidate_id: selectedCandidateId
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                finalVoteBtn.disabled = false;
+                finalVoteBtn.innerHTML = 'Vote';
+                return;
+            }
 
             // Close confirmation and show success
             closeConfirmationModal();
@@ -360,6 +413,11 @@
             // Reset UI state after success
             document.getElementById('vote-sekarang-btn').disabled = true;
             document.getElementById(`candidate-${selectedCandidateId}`).classList.add('selected');
+
+            // Mark as voted to prevent further submissions
+            sudahVote = true;
+            // disable final vote button
+            finalVoteBtn.disabled = true;
 
             // Reset button text
             finalVoteBtn.innerHTML = 'Vote';
@@ -379,15 +437,26 @@
 
         // Disable main vote button on page load (unless criteria met)
         document.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('vote-sekarang-btn').disabled = true;
-             document.getElementById('vote-sekarang-btn').innerText = 'Pilih Kandidat untuk Vote';
+                 const mainVoteBtn = document.getElementById('vote-sekarang-btn');
+                 mainVoteBtn.disabled = true;
+                 mainVoteBtn.innerText = 'Pilih Kandidat untuk Vote';
 
-             // In a real app, this button would be enabled after verifying OTP/Login,
-             // but disabled again after a successful vote.
-             setTimeout(() => {
-                 document.getElementById('vote-sekarang-btn').disabled = false;
-                 document.getElementById('vote-sekarang-btn').innerText = 'Vote Sekarang!';
-             }, 1000); // Simulated loading time
+                 // If already voted, keep voting disabled and show message
+                 if (sudahVote) {
+                     mainVoteBtn.disabled = true;
+                     mainVoteBtn.innerText = 'Anda sudah memilih';
+                     mainVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                     // Optionally visually disable candidate cards
+                     document.querySelectorAll('.candidate-card').forEach(c => c.classList.add('opacity-60', 'pointer-events-none'));
+                     return;
+                 }
+
+                 // In a real app, this button would be enabled after verifying OTP/Login,
+                 // but disabled again after a successful vote.
+                 setTimeout(() => {
+                     mainVoteBtn.disabled = false;
+                     mainVoteBtn.innerText = 'Vote Sekarang!';
+                 }, 1000); // Simulated loading time
         });
 
     </script>

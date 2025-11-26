@@ -1,3 +1,9 @@
+<?php
+
+use Illuminate\Support\Facades\Session;
+
+$npm = Session::get('npm');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,6 +37,7 @@
                 <input type="text" maxlength="1" id="otp-3" class="otp-input text-gray-900" inputmode="numeric">
                 <input type="text" maxlength="1" id="otp-4" class="otp-input text-gray-900" inputmode="numeric">
                 <input type="text" maxlength="1" id="otp-5" class="otp-input text-gray-900" inputmode="numeric">
+                <input type="text" maxlength="1" id="otp-6" class="otp-input text-gray-900" inputmode="numeric">
             </div>
 
             <!-- Error Message Area (Hidden by default, shown on failure) -->
@@ -79,7 +86,7 @@
 
 
     <script>
-        const otpInputs = document.querySelectorAll('#otp-inputs input');
+    const otpInputs = document.querySelectorAll('#otp-inputs input');
         const form = document.getElementById('otp-form');
         const verifyButton = document.getElementById('verify-button');
         const errorState = document.getElementById('error-state');
@@ -87,9 +94,10 @@
         const successModal = document.getElementById('success-modal');
         const resendButton = document.getElementById('resend-button');
 
-        const correctOtp = "71689"; // Dummy correct OTP
+    // CSRF token for POST requests
+    const csrfToken = '{{ csrf_token() }}';
 
-        // Function to move focus automatically and handle backspace
+    // Function to move focus automatically and handle backspace
         otpInputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
                 const value = e.target.value;
@@ -149,11 +157,18 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             resetFormState();
-
             const submittedOtp = Array.from(otpInputs).map(input => input.value).join('');
 
+            // Expecting 6 digits (server generates 6-digit OTP)
             if (submittedOtp.length !== otpInputs.length) {
-                showErrorState("Kode OTP harus terdiri dari 5 digit.");
+                showErrorState("Kode OTP harus terdiri dari 6 digit.");
+                return;
+            }
+
+            // NPM injected from PHP (ensure it's a JS string)
+            const npm = String(@json($npm ?? ''));
+            if (!npm) {
+                showErrorState('NPM tidak ditemukan. Silakan kembali ke halaman login.');
                 return;
             }
 
@@ -161,37 +176,74 @@
             verifyButton.disabled = true;
             verifyButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memverifikasi...`;
 
-            // 2. Simulate API call delay (1.5 seconds)
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            try {
+                const res = await fetch('/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ npm: npm, otp: submittedOtp, _token: csrfToken })
+                });
 
-            // 3. Check OTP
-            if (submittedOtp === correctOtp) {
-                // Success
-                verifyButton.innerHTML = 'Berhasil!';
-                showSuccessModal();
-            } else {
-                // Failure
-                showErrorState("Kode OTP tidak valid atau sudah kadaluarsa");
-            }
+                const json = await res.json().catch(() => ({}));
 
-            // Re-enable button on error (done inside showErrorState, but good to ensure here)
-            if (submittedOtp !== correctOtp) {
-                verifyButton.disabled = false;
+                if (res.ok) {
+                    // Verified successfully → go to /vote
+                    verifyButton.innerHTML = 'Berhasil!';
+                    // clear stored npm as it's no longer needed
+                    try { sessionStorage.removeItem('npm'); } catch(e) {}
+                    window.location.href = '/vote';
+                    return;
+                }
+
+                // Show server-provided message or default
+                showErrorState(json.message || 'Kode OTP tidak valid atau sudah kadaluarsa');
+
+            } catch (err) {
+                showErrorState('Terjadi kesalahan saat memverifikasi. Silakan coba lagi.');
             }
+            // Ensure button state reset handled by showErrorState
         });
-
         resendButton.addEventListener('click', async () => {
              resendButton.disabled = true;
              resendButton.innerHTML = `Mengirim ulang...`;
 
-             // Simulate resend API call delay (2 seconds)
-             await new Promise(resolve => setTimeout(resolve, 2000));
+             const npm = String(@json($npm ?? ''));
+             if (!npm) {
+                 resendButton.innerHTML = `Kirim Ulang`;
+                 resendButton.disabled = false;
+                 showErrorState('NPM tidak ditemukan. Silakan kembali ke halaman login.');
+                 return;
+             }
 
-             resendButton.innerHTML = `Kirim Ulang Berhasil!`;
-             // Hide error and show instruction text again
-             resetFormState();
+             try {
+                 const res = await fetch('/kirim-otp', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                         'X-CSRF-TOKEN': csrfToken,
+                         'Accept': 'application/json'
+                     },
+                     body: JSON.stringify({ npm: npm, _token: csrfToken })
+                 });
 
-             // Reset resend button state after a moment
+                 const json = await res.json().catch(() => ({}));
+
+                 if (res.ok) {
+                     resendButton.innerHTML = `Kirim Ulang Berhasil!`;
+                     resetFormState();
+                 } else {
+                     resendButton.innerHTML = `Kirim Ulang`;
+                     showErrorState(json.message || 'Gagal mengirim ulang OTP.');
+                 }
+
+             } catch (e) {
+                 showErrorState('Terjadi kesalahan saat mengirim ulang.');
+             }
+
+             // Reset resend button state after a short moment
              setTimeout(() => {
                  resendButton.disabled = false;
                  resendButton.innerHTML = `Kirim Ulang`;

@@ -26,18 +26,18 @@
         <form id="login-form">
             <div class="mb-6">
                 <!-- Label is hidden (sr-only) as the placeholder serves as the primary label -->
-                <label for="nim" class="mb-2 block text-sm font-medium text-gray-700 sr-only">Masukkan NIM</label>
+                <label for="npm" class="mb-2 block text-sm font-medium text-gray-700 sr-only">Masukkan NPM</label>
                 <div class="relative">
                     <input
                         type="text"
-                        id="nim"
-                        placeholder="Masukkan NIM"
+                        id="npm"
+                        placeholder="Masukkan NPM"
                         class="w-full rounded-lg border border-gray-300 p-3 pr-10 text-gray-900 focus:border-red-500 focus:ring-red-500"
                         required
                         minlength="8"
                         maxlength="12"
                         pattern="[0-9]*"
-                        title="NIM hanya boleh berisi angka"
+                        title="NPM hanya boleh berisi angka"
                     >
                     <!-- Lock icon matching the video style -->
                     <span class="absolute right-3 top-3 text-gray-400">
@@ -54,10 +54,47 @@
                 Login
             </button>
 
-            <p id="error-message" class="mt-4 text-center text-sm font-medium text-red-600 hidden">NIM tidak valid. Silakan coba lagi.</p>
+            <p id="error-message" class="mt-4 text-center text-sm font-medium text-red-600 hidden">NPM tidak valid. Silakan coba lagi.</p>
         </form>
     </div>
 
 
 </body>
 </html>
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const npm = document.getElementById('npm');
+        
+        (async () => {
+            try {
+                const res = await fetch('/kirim-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ npm: npm.value })
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.message === 'OTP sent successfully!') {
+                    window.location.href = '/otp';
+                    return;
+                }
+
+                const err = document.getElementById('error-message');
+                err.textContent = data.message || 'NPM tidak valid. Silakan coba lagi.';
+                err.classList.remove('hidden');
+            } catch (error) {
+                const err = document.getElementById('error-message');
+                err.textContent = error?.message || 'Terjadi kesalahan. Silakan coba lagi.';
+                err.classList.remove('hidden');
+            }
+        })();
+        
+        
+    });
+</script>
