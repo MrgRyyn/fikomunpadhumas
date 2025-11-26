@@ -1,0 +1,177 @@
+/* fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@import 'tailwindcss';
+
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+
+
+
+.font-inter{
+  font-family: 'Inter';
+}
+
+ .parallelogram-1 {
+            /* Skew the element horizontally by -15 degrees */
+            transform: skewX(-25deg);
+        }
+  /* Fix the content inside the parallelogram */
+  .parallelogram-1 > span {
+      /* Apply the inverse skew to make the text straight again */
+      transform: skewX(25deg);
+      display: block; /* Ensure the span fills the container */
+  }
+
+  @keyframes levitate {
+            0% {
+                /* Start slightly higher */
+                transform: translateY(-7px);
+            }
+            100% {
+                /* Move slightly lower */
+                transform: translateY(7px);
+            }
+        }
+
+        /* 2. Create a Utility Class to Apply the Animation */
+        .animate-levitate {
+            animation: levitate 2s ease-in-out infinite alternate;
+        }
+
+ .parallelogram-bg {
+            /* Skew the element horizontally by -15 degrees */
+            transform: skewX(-45deg);
+        }
+  /* Fix the content inside the parallelogram */
+  .parallelogram-bg > span {
+      /* Apply the inverse skew to make the text straight again */
+      transform: skewX(45deg);
+      display: block; /* Ensure the span fills the container */
+  }
+
+  .maroon-bg {
+            background-color: #780002;
+  }
+  /* Custom yellow button color for the accent, matching the video */
+  .yellow-btn {
+    background-color: #FFD700; /* Gold/Yellow */
+    color: #8B0000; /* Deep Maroon text for contrast */
+    transition: background-color 0.2s;
+  }
+  .yellow-btn:hover {
+    background-color: #FFC700;
+  }
+  .yellow-btn:disabled { opacity: 0.8;
+    cursor: not-allowed;
+  }
+
+  /* Custom styling for OTP inputs */
+        .otp-input {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border: 2px solid #D1D5DB; /* gray-300 */
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .otp-input:focus {
+            border-color: #EF4444; /* red-500 */
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+            outline: none;
+        }
+
+/* Custom scrollbar for aesthetics */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af; /* gray-400 */
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* gray-500 */
+        }
+
+        /* Sidebar container */
+        #sidebar {
+            /* Mobile: Starts off-screen */
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Desktop: Always visible */
+        @media (min-width: 768px) {
+            #sidebar {
+                transform: translateX(0);
+            }
+        }
+
+        /* Mobile: Slides in when active */
+        #sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* Simple transition for main content margin */
+        #main-content {
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        /* Navigation link styles */
+        .nav-link {
+            display: flex;
+            align-items: center;
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem; /* p-3 */
+            color: #fecaca; /* text-red-100 */
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #780000; /* hover:bg-red-800 */
+        }
+        .nav-link.active {
+            background-color: white;
+            color: #780000; /* text-red-900 */
+            font-weight: 500; /* font-medium */
+        }
+
+
+        /* Modal backdrop styling */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Responsive video container for Visi Misi Modal */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            margin-bottom: 1rem;
+        }
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+            object-fit: cover;
+        }
+
+        /* Candidate Card Selection Highlight */
+        .candidate-card.selected {
+            border-color: #FFD700; /* Yellow highlight */
+            box-shadow: 0 0 0 4px #FFD700;
+        }
