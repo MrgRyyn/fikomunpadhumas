@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Session;
+use App\Models\Mahasiswa;
 
 $npm = Session::get('npm');
+$nama = Mahasiswa::where('npm', $npm)->value('nama');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,9 +29,12 @@ $npm = Session::get('npm');
 
     <!-- OTP Card -->
     <div class="w-full max-w-sm rounded-xl bg-white p-8 shadow-2xl md:max-w-md md:p-12">
-        <h1 class="mb-6 text-center text-3xl font-bold text-gray-800">Kode OTP</h1>
+    <h1 class="mb-6 text-center text-3xl font-bold text-gray-800">Kode OTP</h1>
 
-        <form id="otp-form">
+    
+    <p class="mb-4 text-center text-sm text-gray-600">Halo {{ $nama }}</p>
+
+    <form id="otp-form">
             <!-- OTP Inputs Container -->
             <div id="otp-inputs" class="mb-6 flex justify-center space-x-2 sm:space-x-3">
                 <input type="text" maxlength="1" id="otp-1" class="otp-input text-gray-900" inputmode="numeric">
@@ -54,8 +59,7 @@ $npm = Session::get('npm');
             <!-- Instruction Text -->
             <p id="instruction-text" class="mb-6 text-center text-sm text-gray-600">
                 <i class="fas fa-envelope text-red-700 mr-1"></i>
-                Silahkan cek email
-                untuk mendapatkan kode OTP
+            OTP telah dikirim ke email terdaftar untuk <strong>{{ $npm ?? 'N/A' }}</strong>. Cek kotak masuk email Anda dan masukkan kode di atas.
             </p>
 
             <!-- Verification Button -->
@@ -179,6 +183,7 @@ $npm = Session::get('npm');
             try {
                 const res = await fetch('/verify-otp', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken,
@@ -221,6 +226,7 @@ $npm = Session::get('npm');
              try {
                  const res = await fetch('/kirim-otp', {
                      method: 'POST',
+                    credentials: 'same-origin',
                      headers: {
                          'Content-Type': 'application/json',
                          'X-CSRF-TOKEN': csrfToken,

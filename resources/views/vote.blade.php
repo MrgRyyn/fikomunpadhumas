@@ -386,14 +386,13 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
             try{
                 const response = await fetch('/submit-vote', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    credentials: 'same-origin',
                     body: JSON.stringify({
-                        npm: npm,
                         candidate_id: selectedCandidateId
                     })
                 });

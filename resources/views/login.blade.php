@@ -49,9 +49,13 @@
             <button
                 type="submit"
                 id="login-button"
-                class="yellow-btn w-full rounded-lg py-3 text-lg font-bold shadow-lg focus:outline-none focus:ring-4 focus:ring-yellow-500/50"
+                class="yellow-btn w-full rounded-lg py-3 text-lg font-bold shadow-lg focus:outline-none focus:ring-4 focus:ring-yellow-500/50 flex items-center justify-center space-x-2"
             >
-                Login
+                <svg id="login-spinner" class="hidden h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
+                <span id="login-text">Login</span>
             </button>
 
             <p id="error-message" class="mt-4 text-center text-sm font-medium text-red-600 hidden">NPM tidak valid. Silakan coba lagi.</p>
@@ -64,13 +68,21 @@
 <script>
     document.getElementById('login-form').addEventListener('submit', function(event) {
         event.preventDefault();
-
         const npm = document.getElementById('npm');
-        
+        const btn = document.getElementById('login-button');
+        const spinner = document.getElementById('login-spinner');
+        const text = document.getElementById('login-text');
+
+        // show spinner, disable button
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+        if (text) text.classList.add('opacity-50');
+
         (async () => {
             try {
                 const res = await fetch('/kirim-otp', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -81,20 +93,25 @@
                 const data = await res.json().catch(() => ({}));
 
                 if (res.ok && data.message === 'OTP sent successfully!') {
-                    window.location.href = '/otp';
+                    window.location.href = '/otp?redirect-from=login';
                     return;
                 }
 
+                // show error and re-enable
                 const err = document.getElementById('error-message');
                 err.textContent = data.message || 'NPM tidak valid. Silakan coba lagi.';
                 err.classList.remove('hidden');
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.classList.remove('opacity-50');
             } catch (error) {
                 const err = document.getElementById('error-message');
                 err.textContent = error?.message || 'Terjadi kesalahan. Silakan coba lagi.';
                 err.classList.remove('hidden');
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('hidden');
+                if (text) text.classList.remove('opacity-50');
             }
         })();
-        
-        
     });
 </script>

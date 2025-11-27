@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Mahasiswa;
+use Illuminate\Support\Facades\Auth;
+
 
 class OTPController extends Controller
 {
@@ -119,7 +121,16 @@ class OTPController extends Controller
 
         if (Hash::check((string) $otpInput, $record->otp)) {
             $record->delete(); 
-            return response()->json(['message' => 'OTP is valid!']);
+            $user = Mahasiswa::where('npm', $npm)->first();
+            if ($user) {
+                Auth::login($user);
+                // regenerate session to prevent fixation and ensure session cookie is fresh
+                $request->session()->regenerate();
+                // Optionally persist npm in session for legacy view code
+                Session::put('npm', $npm);
+                return response()->json(['message' => 'OTP is valid!']);
+            }
+            return response()->json(['message' => 'User not found.'], 404);
         }
 
         return response()->json(['message' => 'Invalid or expired OTP.'], 400);
