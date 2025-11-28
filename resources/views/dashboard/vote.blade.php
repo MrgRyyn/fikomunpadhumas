@@ -220,14 +220,15 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
 
     // Server-provided values
     const npm = String(@json($npm ?? ''));
-    let sudahVote = Boolean(@json($sudah_vote ?? 0));
+    let sudahVote = @json((bool) $sudah_vote);
+
 
         // --- Dummy Candidate Data for Modals ---
         const candidates = {
             1: {
                 name: "Leona Kristin Marbun",
                 visi: "Menciptakan Himpunan Mahasiswa Hubungan Masyarakat sebagai ruang tumbuh kolaboratif dan kreatif serta membangun lingkungan organisasi yang nyaman dan berdampak.",
-                video_path: "{{ asset('assets/img/candidate 1 video.mp4') }}",
+                video_path: "https://pemray.sgp1.cdn.digitaloceanspaces.com/candidate%201%20video.mp4",
                 misi: [
                     "Menguatkan sinergi dan kolaborasi antar departemen agar lebih berkesinambungan dan saling mendukung",
                     "Mendorong kreativitas dalam setiap program kerja agar himpunan menjadi ruang berkembang yang menyenangkan",
@@ -241,7 +242,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
             2: {
                 name: "Muhammad Faishal Akmal",
                 visi: "Terwujudnya Hima Humas sebagai ruang untuk pengembangan diri berlandaskan SIKAP (Sinergi, Integritas, Kekeluargaan, Apresiatif, Profesional)",
-                video_path: "{{ asset('assets/img/candidate 2 video.mov') }}",
+                video_path: "https://pemray.sgp1.cdn.digitaloceanspaces.com/candidate%202%20video.mov",
                 misi: [
                     "Terwujudnya rasa saling memiliki antar anggota",
                     "Terciptanya komunikasi yang terbuka dan transparan",

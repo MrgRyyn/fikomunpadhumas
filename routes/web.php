@@ -44,3 +44,4 @@ Route::get('logout', function() {
 });
 
 Route::get('admin', [DashboardController::class, 'index'])->middleware(LoginMiddleware::class);
+Route::post('admin/update-mahasiswa', [DashboardController::class, 'updateMahasiswa'])->middleware(LoginMiddleware::class);

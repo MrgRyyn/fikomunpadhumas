@@ -42,11 +42,39 @@ class DashboardController extends Controller
                 'nim' => $m->npm,
                 'nama' => $m->nama,
                 'email' => $m->email,
+                'angkatan' => $m->angkatan,
+                'role' => $m->role,
                 'sudah_vote' => $m->sudah_vote ? 'Sudah' : 'Belum',
                 'pilihan' => Vote::where('voter_npm', $m->npm)->value('candidate_id') ?? '-'
             ];
         })->values()->toArray();
 
         return view('dashboard.admin', compact('mahasiswas', 'voteCounts', 'totalVotes', 'votes', 'mahasiswasForJs'));
+    }
+
+    public function updateMahasiswa(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:mahasiswas,id',
+            'npm' => 'required|string',
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'angkatan' => 'nullable|string|max:10',
+            'role' => 'nullable|string|in:admin,'
+        ]);
+
+        $mahasiswa = Mahasiswa::findOrFail($validated['id']);
+        
+        $mahasiswa->update([
+            'nama' => $validated['nama'],
+            'email' => $validated['email'],
+            'angkatan' => $validated['angkatan'],
+            'role' => $validated['role']
+        ]);
+
+        return response()->json([
+            'message' => 'Data mahasiswa berhasil diupdate!',
+            'mahasiswa' => $mahasiswa
+        ], 200);
     }
 }

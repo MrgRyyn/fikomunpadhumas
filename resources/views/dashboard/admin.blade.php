@@ -140,6 +140,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Sudah Vote?</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Pilihan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="data-table-body" class="divide-y divide-gray-200 bg-white">
@@ -186,6 +187,62 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
 
 
             </main>
+        </div>
+    </div>
+
+    <!-- Edit Mahasiswa Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 p-4" onclick="closeEditModal(event)">
+        <div class="w-full max-w-md transform overflow-hidden rounded-xl bg-white p-6 shadow-xl" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b pb-3 mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Edit Data Mahasiswa</h3>
+                <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeEditModal()">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="edit-form">
+                <input type="hidden" id="edit-id" name="id">
+                
+                <div class="mb-4">
+                    <label for="edit-npm" class="block text-sm font-medium text-gray-700 mb-1">NPM</label>
+                    <input type="text" id="edit-npm" name="npm" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500" required readonly>
+                </div>
+
+                <div class="mb-4">
+                    <label for="edit-nama" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                    <input type="text" id="edit-nama" name="nama" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="edit-email" name="email" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="edit-angkatan" class="block text-sm font-medium text-gray-700 mb-1">Angkatan</label>
+                    <input type="text" id="edit-angkatan" name="angkatan" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500">
+                </div>
+
+                <div class="mb-4">
+                    <label for="edit-role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <select id="edit-role" name="role" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500">
+                        <option value="">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <p id="edit-error-message" class="mb-3 text-center text-sm font-medium text-red-600 hidden"></p>
+                <p id="edit-success-message" class="mb-3 text-center text-sm font-medium text-green-600 hidden"></p>
+
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <button type="button" class="rounded-lg border border-gray-300 px-6 py-2 font-semibold text-gray-700 hover:bg-gray-100" onclick="closeEditModal()">
+                        Batal
+                    </button>
+                    <button type="submit" id="edit-submit-btn" class="rounded-lg bg-red-700 px-6 py-2 font-semibold text-white hover:bg-red-800">
+                        Simpan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -301,7 +358,11 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.email}</td>
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.sudah_vote}</td>
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.pilihan}</td>
-                        
+                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                            <button class="rounded-full p-2 hover:bg-gray-100" onclick="openEditModal(${row.id}, '${row.nim}', '${row.nama}', '${row.email}', '${row.angkatan || ''}', '${row.role || ''}')">
+                                <i class="fas fa-edit text-red-700"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -388,6 +449,96 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                         renderTable();
                     }
                 });
+            }
+        });
+
+        // --- Edit Modal Functions ---
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-form');
+        const editErrorMessage = document.getElementById('edit-error-message');
+        const editSuccessMessage = document.getElementById('edit-success-message');
+        const editSubmitBtn = document.getElementById('edit-submit-btn');
+
+        function openEditModal(id, npm, nama, email, angkatan, role) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-npm').value = npm;
+            document.getElementById('edit-nama').value = nama;
+            document.getElementById('edit-email').value = email;
+            document.getElementById('edit-angkatan').value = angkatan || '';
+            document.getElementById('edit-role').value = role || '';
+            
+            editErrorMessage.classList.add('hidden');
+            editSuccessMessage.classList.add('hidden');
+            
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+        }
+
+        function closeEditModal(event) {
+            if (event && event.target !== editModal) return;
+            editModal.classList.add('hidden');
+            editModal.classList.remove('flex');
+        }
+
+        editForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            editErrorMessage.classList.add('hidden');
+            editSuccessMessage.classList.add('hidden');
+            editSubmitBtn.disabled = true;
+            editSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
+
+            const formData = {
+                id: document.getElementById('edit-id').value,
+                npm: document.getElementById('edit-npm').value,
+                nama: document.getElementById('edit-nama').value,
+                email: document.getElementById('edit-email').value,
+                angkatan: document.getElementById('edit-angkatan').value,
+                role: document.getElementById('edit-role').value
+            };
+
+            try {
+                const response = await fetch('/admin/update-mahasiswa', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    editSuccessMessage.innerText = data.message || 'Data berhasil diupdate!';
+                    editSuccessMessage.classList.remove('hidden');
+                    
+                    // Update local data
+                    const rowIndex = allData.findIndex(row => row.id == formData.id);
+                    if (rowIndex !== -1) {
+                        allData[rowIndex].nama = formData.nama;
+                        allData[rowIndex].email = formData.email;
+                        allData[rowIndex].angkatan = formData.angkatan;
+                        allData[rowIndex].role = formData.role;
+                        currentViewData = [...allData];
+                        renderTable();
+                    }
+                    
+                    setTimeout(() => {
+                        closeEditModal();
+                    }, 1500);
+                } else {
+                    editErrorMessage.innerText = data.message || 'Gagal mengupdate data.';
+                    editErrorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                editErrorMessage.innerText = 'Terjadi kesalahan. Silakan coba lagi.';
+                editErrorMessage.classList.remove('hidden');
+            } finally {
+                editSubmitBtn.disabled = false;
+                editSubmitBtn.innerHTML = 'Simpan';
             }
         });
     </script>
