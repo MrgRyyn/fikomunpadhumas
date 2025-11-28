@@ -138,8 +138,8 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIM</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Sudah Vote?</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Pilihan</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="data-table-body" class="divide-y divide-gray-200 bg-white">
@@ -299,12 +299,9 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.nim}</td>
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.nama}</td>
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.email}</td>
+                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.sudah_vote}</td>
                         <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">${row.pilihan}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                            <button class="rounded-full p-2 hover:bg-gray-100">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </td>
+                        
                     </tr>
                 `;
             }).join('');

@@ -42,9 +42,8 @@ class VoteController extends Controller
 
         $mahasiswa->sudah_vote = 1;
         $mahasiswa->save();
-        $hashnpm = Hash::make($npm);
         Vote::create([
-            'voter_npm' => $hashnpm,
+            'voter_npm' => $npm,
             'candidate_id' => $candidateId,
         ]);
         return response()->json(['message' => 'Vote recorded successfully.'], 201);

@@ -42,7 +42,8 @@ class DashboardController extends Controller
                 'nim' => $m->npm,
                 'nama' => $m->nama,
                 'email' => $m->email,
-                'pilihan' => $m->sudah_vote ? 'Sudah' : 'Belum'
+                'sudah_vote' => $m->sudah_vote ? 'Sudah' : 'Belum',
+                'pilihan' => Vote::where('voter_npm', $m->npm)->value('candidate_id') ?? '-'
             ];
         })->values()->toArray();
 
