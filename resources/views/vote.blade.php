@@ -24,6 +24,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
     <!-- Assuming you are using Vite, but the script still relies on inline styles -->
     @vite('resources/css/app.css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 
 
 </head>
