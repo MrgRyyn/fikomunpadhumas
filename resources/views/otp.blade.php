@@ -5,6 +5,7 @@ use App\Models\Mahasiswa;
 
 $npm = Session::get('npm');
 $nama = Mahasiswa::where('npm', $npm)->value('nama');
+$email = Mahasiswa::where('npm', $npm)->value('email');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,7 +61,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
             <!-- Instruction Text -->
             <p id="instruction-text" class="mb-6 text-center text-sm text-gray-600">
                 <i class="fas fa-envelope text-red-700 mr-1"></i>
-            OTP telah dikirim ke email terdaftar untuk <strong>{{ $npm ?? 'N/A' }}</strong>. Cek kotak masuk email Anda dan masukkan kode di atas.
+            OTP telah dikirim untuk email <strong>{{ $email ?? 'N/A' }}</strong>. Cek kotak masuk email termasuk folder spam.
             </p>
 
             <!-- Verification Button -->
