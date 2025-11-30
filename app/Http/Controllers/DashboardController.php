@@ -60,7 +60,7 @@ class DashboardController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'angkatan' => 'nullable|string|max:10',
-            'role' => 'nullable|string|in:admin,'
+            'role' => 'nullable|string|in:admin,user'
         ]);
 
         $mahasiswa = Mahasiswa::findOrFail($validated['id']);

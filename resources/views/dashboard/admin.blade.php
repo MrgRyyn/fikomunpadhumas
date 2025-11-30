@@ -227,7 +227,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                 <div class="mb-4">
                     <label for="edit-role" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
                     <select id="edit-role" name="role" class="w-full rounded-lg border border-gray-300 p-2 text-gray-900 focus:border-red-500 focus:ring-red-500">
-                        <option value="">User</option>
+                        <option value="user">User</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>

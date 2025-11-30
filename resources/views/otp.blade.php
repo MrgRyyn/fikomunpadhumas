@@ -52,8 +52,12 @@ $email = Mahasiswa::where('npm', $npm)->value('email');
                 <p id="error-message" class="text-md font-semibold text-red-600">
                     Kode OTP tidak valid atau sudah kadaluarsa
                 </p>
-                <!-- Kirim Ulang Button -->
-                <button type="button" id="resend-button" class="mt-2 text-sm font-medium text-red-700 hover:text-red-900">
+                
+                
+            </div>
+            <!-- Kirim Ulang Button (centered) -->
+            <div class="mt-2 flex justify-center">
+                <button type="button" id="resend-button" class="text-sm font-medium text-red-700 hover:text-red-900">
                     Kirim Ulang
                 </button>
             </div>
@@ -102,6 +106,62 @@ $email = Mahasiswa::where('npm', $npm)->value('email');
 
     // CSRF token for POST requests
     const csrfToken = '{{ csrf_token() }}';
+    // NPM injected from PHP (ensure it's a JS string) and available globally for cooldown storage keying
+    const npm = String(@json($npm ?? ''));
+
+    // --- Resend cooldown logic (3 minutes, in-memory only) ---
+    const COOLDOWN_MS = 3 * 60 * 1000; // 3 minutes
+    let cooldownTimer = null;
+    let cooldownUntil = 0;
+
+    function formatTime(ms) {
+        const total = Math.max(0, Math.ceil(ms / 1000));
+        const m = String(Math.floor(total / 60)).padStart(2, '0');
+        const s = String(total % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function setResendDisabled(disabled, label) {
+        resendButton.disabled = !!disabled;
+        if (disabled) {
+            resendButton.style.opacity = '0.6';
+            resendButton.style.pointerEvents = 'none';
+        } else {
+            resendButton.style.opacity = '';
+            resendButton.style.pointerEvents = '';
+        }
+        if (typeof label === 'string') resendButton.innerHTML = label;
+    }
+
+    function clearCooldownTimer() {
+        if (cooldownTimer) {
+            clearInterval(cooldownTimer);
+            cooldownTimer = null;
+        }
+    }
+
+    function startCooldown(durationMs = COOLDOWN_MS) {
+        cooldownUntil = Date.now() + durationMs;
+        runCooldown();
+    }
+
+    function runCooldown() {
+        clearCooldownTimer();
+        function tick() {
+            const now = Date.now();
+            const remaining = cooldownUntil - now;
+            if (remaining <= 0) {
+                clearCooldownTimer();
+                setResendDisabled(false, 'Kirim Ulang');
+                return;
+            }
+            setResendDisabled(true, `Kirim Ulang (${formatTime(remaining)})`);
+        }
+        tick();
+        cooldownTimer = setInterval(tick, 1000);
+    }
+    // Start fresh cooldown on page load (no persistence)
+    startCooldown(COOLDOWN_MS);
 
     // Function to move focus automatically and handle backspace
         otpInputs.forEach((input, index) => {
@@ -171,8 +231,6 @@ $email = Mahasiswa::where('npm', $npm)->value('email');
                 return;
             }
 
-            // NPM injected from PHP (ensure it's a JS string)
-            const npm = String(@json($npm ?? ''));
             if (!npm) {
                 showErrorState('NPM tidak ditemukan. Silakan kembali ke halaman login.');
                 return;
@@ -214,49 +272,47 @@ $email = Mahasiswa::where('npm', $npm)->value('email');
             // Ensure button state reset handled by showErrorState
         });
         resendButton.addEventListener('click', async () => {
-             resendButton.disabled = true;
-             resendButton.innerHTML = `Mengirim ulang...`;
+            // If still in cooldown, do nothing (guard for any race)
+            if (resendButton.disabled && resendButton.innerText.includes(':')) return;
 
-             const npm = String(@json($npm ?? ''));
-             if (!npm) {
-                 resendButton.innerHTML = `Kirim Ulang`;
-                 resendButton.disabled = false;
-                 showErrorState('NPM tidak ditemukan. Silakan kembali ke halaman login.');
-                 return;
-             }
+            setResendDisabled(true, 'Mengirim ulang...');
 
-             try {
-                 const res = await fetch('/kirim-otp', {
-                     method: 'POST',
+            if (!npm) {
+                setResendDisabled(false, 'Kirim Ulang');
+                showErrorState('NPM tidak ditemukan. Silakan kembali ke halaman login.');
+                return;
+            }
+
+            try {
+                const res = await fetch('/kirim-otp', {
+                    method: 'POST',
                     credentials: 'same-origin',
-                     headers: {
-                         'Content-Type': 'application/json',
-                         'X-CSRF-TOKEN': csrfToken,
-                         'Accept': 'application/json'
-                     },
-                     body: JSON.stringify({ npm: npm, _token: csrfToken })
-                 });
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ npm: npm, _token: csrfToken })
+                });
 
-                 const json = await res.json().catch(() => ({}));
+                const json = await res.json().catch(() => ({}));
 
-                 if (res.ok) {
-                     resendButton.innerHTML = `Kirim Ulang Berhasil!`;
-                     resetFormState();
-                 } else {
-                     resendButton.innerHTML = `Kirim Ulang`;
-                     showErrorState(json.message || 'Gagal mengirim ulang OTP.');
-                 }
+                if (res.ok) {
+                    // Success: reset the cooldown timer
+                    resetFormState();
+                    startCooldown(COOLDOWN_MS);
+                } else {
+                    setResendDisabled(false, 'Kirim Ulang');
+                    showErrorState(json.message || 'Gagal mengirim ulang OTP.');
+                }
 
-             } catch (e) {
-                 showErrorState('Terjadi kesalahan saat mengirim ulang.');
-             }
-
-             // Reset resend button state after a short moment
-             setTimeout(() => {
-                 resendButton.disabled = false;
-                 resendButton.innerHTML = `Kirim Ulang`;
-             }, 3000);
+            } catch (e) {
+                setResendDisabled(false, 'Kirim Ulang');
+                showErrorState('Terjadi kesalahan saat mengirim ulang.');
+            }
         });
+
+        // Cooldown already started above on page load
     </script>
 
 </body>
