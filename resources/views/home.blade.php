@@ -27,7 +27,7 @@
         <div class="flex flex-row justify-between z-20">
             <div>
                 <h3 class=" text-white font-inter lg:text-xl">Kabinet</h3>
-                <h3 class=" text-white font-inter lg:text-xl font-bold">Andikara</h3>
+                <h3 class=" text-white font-inter lg:text-xl font-bold">Adikara</h3>
             </div>
             <img src="{{asset('assets/img/logo 2.png')}}" class=" w-16 relative bottom-4 lg:w-20" alt="">
         </div>

@@ -112,9 +112,9 @@
 
         <!-- FOOTER -->
         <div class="footer">
-            <div>Panitia Pemilu Raya HIMA HUMAS 2025</div>
+            <div>Pemilu Raya HIMA HUMAS 2025</div>
             <div>Mohon untuk tidak membalas email ini.</div>
-            <div>Butuh bantuan? Hubungi Panitia</div>
+            <div>Butuh bantuan? Hubungi CP</div>
         </div>
     </div>
 </body>
