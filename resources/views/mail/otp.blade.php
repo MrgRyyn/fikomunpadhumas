@@ -95,7 +95,7 @@
     <div class="container">
         <!-- HEADER -->
         <div class="header">
-            <img class="logo" src="{{asset('assets/img/logo 2.png')}}" alt="Logo" />
+            <img class="logo" src="https://pemray.sgp1.cdn.digitaloceanspaces.com/logo%202.png" alt="Logo" />
             <div class="title">Halo, {{$data['user']}}</div>
             <div class="subtitle">Berikut adalah kode OTP Anda:</div>
         </div>
