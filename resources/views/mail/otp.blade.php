@@ -95,7 +95,7 @@
     <div class="container">
         <!-- HEADER -->
         <div class="header">
-            <img class="logo" src="https://i.ibb.co.com/3yTB6m4G/logo.png" alt="Logo" />
+            <img class="logo" src="{{asset('assets/img/logo 2.png')}}" alt="Logo" />
             <div class="title">Halo, {{$data['user']}}</div>
             <div class="subtitle">Berikut adalah kode OTP Anda:</div>
         </div>
@@ -114,7 +114,7 @@
         <div class="footer">
             <div>Pemilu Raya HIMA HUMAS 2025</div>
             <div>Mohon untuk tidak membalas email ini.</div>
-            <div>Butuh bantuan? Hubungi CP</div>
+            <div>Butuh bantuan? Hubungi CP Line <span class="font-semibold">rahmafzhr</span> (Rahma) atau <span class="font-semibold">darasandra10</span> (Dara)</div>
         </div>
     </div>
 </body>

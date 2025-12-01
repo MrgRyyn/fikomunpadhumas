@@ -33,14 +33,16 @@
         </div>
         <div class=" z-20 px-10 py-10 flex flex-col items-center justify-center md:flex-row">
             <div class="lg:px-10">
-                <div class="justify-center items-center parallelogram-1 px-4 py-2 bg-[#FFDB4F] md:px-7 md:parallelogram-bg">
-                    <span class=" text-lg font-inter font-bold md:text-2xl lg:text-4xl xl:text-5xl">Pemilu Raya <span class=" text-[#780002] underline">HIMA HUMAS 2025</span></span>
+                <div class="flex items-center justify-center px-6 py-4 bg-[#FFDB4F] rounded-2xl shadow-lg md:px-8">
+                    <span class="text-center font-inter font-bold text-xl md:text-3xl lg:text-4xl xl:text-5xl">
+                        Pemilu Raya <span class="text-[#780002]">HIMA HUMAS 2025</span>
+                    </span>
                 </div>
                 <div class=" my-3 flex flex-col items-center justify-center md:justify-start md:items-start">
                     <p class="text-white font-inter text-sm lg:text-xl">Ayo gunakan suara kamu di Pemilu Raya Hima Humas!</p>
                     <p class="text-white self-start font-inter text-sm lg:text-xl">Pilihanmu menentukan masa depan.</p>
                     <a href="/login" class=" cursor-pointer">
-                        <button class=" bg-[#FFDB4F] italic px-3 py-1 rounded-full my-5 font-bold hover:shadow-lg hover:shadow-amber-800 hover:bg-amber-400 lg:text-xl xl:text-2xl lg:px-7 lg:py-3">
+                        <button class=" bg-[#FFDB4F] px-3 py-1 rounded-full my-5 font-bold hover:shadow-lg hover:shadow-amber-800 hover:bg-amber-400 lg:text-xl xl:text-2xl lg:px-7 lg:py-3">
                         Vote sekarang!
                         </button>
                     </a>
@@ -52,6 +54,16 @@
         </div>
         <div class="absolute -left-10 bottom-0 md:-bottom-28 lg:-bottom-48 lg:w-3/4">
             <img src="{{asset('assets/img/background effect.png')}}" alt="">
+        </div>
+    </section>
+    <!-- Contact Person Info -->
+    <section class="bg-[#780002] px-5 pb-8 lg:px-12">
+        <div class="mx-auto max-w-3xl rounded-2xl bg-[#FFDB4F] p-5 text-black">
+            <h2 class="mb-2 text-center text-lg font-bold">Contact Person</h2>
+            <div class="space-y-1 text-center">
+                <p class="text-sm lg:text-base">Line: <span class="font-semibold">rahmafzhr</span> (Rahma)</p>
+                <p class="text-sm lg:text-base">Line: <span class="font-semibold">darasandra10</span> (Dara)</p>
+            </div>
         </div>
     </section>
 </body>

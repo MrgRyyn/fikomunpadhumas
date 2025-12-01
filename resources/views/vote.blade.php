@@ -193,7 +193,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
                 <i class="fas fa-check text-4xl text-green-600"></i>
             </div>
             <h3 class="mb-2 text-2xl font-bold text-gray-800">Berhasil</h3>
-            <p class="mb-6 text-gray-600">Vote anda berhasil dikirim!</p>
+            <p class="mb-6 text-gray-600">Suara anda telah digunakan! Terima Kasih Mas/Mbak</p>
 
             <button type="button" class="rounded-lg bg-red-700 px-8 py-3 font-bold text-white hover:bg-red-800" onclick="closeSuccessModal()">
                 OK
