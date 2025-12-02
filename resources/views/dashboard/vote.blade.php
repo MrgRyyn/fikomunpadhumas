@@ -243,7 +243,7 @@ $nama = Mahasiswa::where('npm', $npm)->value('nama');
             2: {
                 name: "Muhammad Faishal Akmal",
                 visi: "Terwujudnya Hima Humas sebagai ruang untuk pengembangan diri berlandaskan SIKAP (Sinergi, Integritas, Kekeluargaan, Apresiatif, Profesional)",
-                video_path: "https://pemray.sgp1.cdn.digitaloceanspaces.com/candidate%202%20video.mov",
+                video_path: "https://pemray.sgp1.cdn.digitaloceanspaces.com/candidate%202%20video.mp4",
                 misi: [
                     "Terwujudnya rasa saling memiliki antar anggota",
                     "Terciptanya komunikasi yang terbuka dan transparan",
