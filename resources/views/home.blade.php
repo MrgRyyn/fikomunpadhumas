@@ -41,9 +41,9 @@
                 <div class=" my-3 flex flex-col items-center justify-center md:justify-start md:items-start">
                     <p class="text-white font-inter text-sm lg:text-xl">Ayo gunakan suara kamu di Pemilu Raya Hima Humas!</p>
                     <p class="text-white self-start font-inter text-sm lg:text-xl">Pilihanmu menentukan masa depan.</p>
-                    <a href="/login" class=" cursor-pointer">
-                        <button class=" bg-[#FFDB4F] px-3 py-1 rounded-full my-5 font-bold hover:shadow-lg hover:shadow-amber-800 hover:bg-amber-400 lg:text-xl xl:text-2xl lg:px-7 lg:py-3">
-                        Vote sekarang!
+                    <a class="cursor-not-allowed pointer-events-none" aria-disabled="true" tabindex="-1">
+                        <button class="bg-[#FFDB4F] px-3 py-1 rounded-full my-5 font-bold lg:text-xl xl:text-2xl lg:px-7 lg:py-3 opacity-50 cursor-not-allowed" disabled>
+                            Vote Berakhir
                         </button>
                     </a>
                 </div>

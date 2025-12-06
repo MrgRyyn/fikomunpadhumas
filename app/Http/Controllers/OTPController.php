@@ -48,6 +48,15 @@ class OTPController extends Controller
             }
         }
 
+        // Hapus saat belum berakhir
+        $voteEnded = true;
+        if ($voteEnded ) {
+            $role = Mahasiswa::where('npm', $npm)->value('role');
+            if ($role !== 'admin') {
+                return response()->json(['message' => 'Voting telah berakhir. Akses ditolak'], 403);
+            }
+        }
+
         $otpPlain = rand(100000, 999999);
         $otpHash = Hash::make((string) $otpPlain);
         $expiresAt = Carbon::now()->addMinutes(10);
